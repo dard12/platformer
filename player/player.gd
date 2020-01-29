@@ -3,11 +3,11 @@ extends KinematicBody2D
 class_name Player
 
 
-const GRAVITY_VEC = Vector2(0, 900)
+const GRAVITY_VEC = Vector2(0, 1400)
 const FLOOR_NORMAL = Vector2(0, -1)
 const SLOPE_SLIDE_STOP = 25.0
 const WALK_SPEED = 250 # pixels/sec
-const JUMP_SPEED = 480
+const JUMP_SPEED = 700
 const SIDING_CHANGE_SPEED = 10
 const BULLET_VELOCITY = 1000
 const SHOOT_TIME_SHOW_WEAPON = 0.2
@@ -16,6 +16,8 @@ var linear_vel = Vector2()
 var shoot_time = 99999 # time since last shot
 
 var anim = ""
+var floor_jumps = 0;
+var wall_jumps = 0;
 
 # cache the sprite here for fast access (we will set scale to flip it often)
 onready var sprite = $Sprite
@@ -35,7 +37,12 @@ func _physics_process(delta):
 	linear_vel = move_and_slide(linear_vel, FLOOR_NORMAL, SLOPE_SLIDE_STOP)
 	# Detect if we are on floor - only works if called *after* move_and_slide
 	var on_floor = is_on_floor()
-
+	var on_wall = is_on_wall()
+	
+	if on_floor:
+		floor_jumps = 2
+		wall_jumps = 1
+	
 	### CONTROL ###
 
 	# Horizontal movement
@@ -49,7 +56,17 @@ func _physics_process(delta):
 	linear_vel.x = lerp(linear_vel.x, target_speed, 1)
 
 	# Jumping
-	if on_floor and Input.is_action_just_pressed("jump"):
+	var can_wall_jump = on_wall and wall_jumps;
+	var can_floor_jump = floor_jumps;
+
+	if Input.is_action_just_pressed("jump") and (can_wall_jump or can_floor_jump):
+		if can_wall_jump:
+			linear_vel.x = lerp(linear_vel.x, target_speed * -1, 1)
+			wall_jumps -= 1
+		else:
+			if can_floor_jump:
+				floor_jumps -= 1
+
 		linear_vel.y = -JUMP_SPEED
 		($SoundJump as AudioStreamPlayer2D).play()
 

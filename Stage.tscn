@@ -49,7 +49,7 @@ position = Vector2( 1700.06, 1066.92 )
 rotation = 0.547997
 
 [node name="OneWayPlatform1" parent="Props" instance=ExtResource( 4 )]
-position = Vector2( 967.609, 836.547 )
+position = Vector2( 470.194, 994.457 )
 
 [node name="Player" parent="." instance=ExtResource( 5 )]
 position = Vector2( 251.684, 1045.6 )
