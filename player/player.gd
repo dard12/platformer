@@ -3,12 +3,11 @@ extends KinematicBody2D
 class_name Player
 
 
-const GRAVITY_VEC = Vector2(0, 1400)
+const GRAVITY_VEC = Vector2(0, 2000)
 const FLOOR_NORMAL = Vector2(0, -1)
 const SLOPE_SLIDE_STOP = 25.0
 const WALK_SPEED = 250 # pixels/sec
-const JUMP_SPEED = 700
-const SIDING_CHANGE_SPEED = 10
+const JUMP_SPEED = 800
 const BULLET_VELOCITY = 1000
 const SHOOT_TIME_SHOW_WEAPON = 0.2
 
@@ -54,14 +53,13 @@ func _physics_process(delta):
 
 	target_speed *= WALK_SPEED
 	linear_vel.x = lerp(linear_vel.x, target_speed, 1)
-
+	
 	# Jumping
 	var can_wall_jump = on_wall and wall_jumps;
 	var can_floor_jump = floor_jumps;
 
 	if Input.is_action_just_pressed("jump") and (can_wall_jump or can_floor_jump):
 		if can_wall_jump:
-			linear_vel.x = lerp(linear_vel.x, target_speed * -1, 1)
 			wall_jumps -= 1
 		else:
 			if can_floor_jump:
@@ -84,12 +82,12 @@ func _physics_process(delta):
 
 	var new_anim = "idle"
 
-	if on_floor:
-		if linear_vel.x < -SIDING_CHANGE_SPEED:
+	if on_floor or on_wall:
+		if Input.is_action_pressed("move_left"):
 			sprite.scale.x = -1
 			new_anim = "run"
 
-		if linear_vel.x > SIDING_CHANGE_SPEED:
+		if Input.is_action_pressed("move_right"):
 			sprite.scale.x = 1
 			new_anim = "run"
 	else:
